@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code to PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <h2>QR Code PDF Generator</h2>
+
+  <input type="text" id="qrText" placeholder="Enter text for QR" value="https://example.com">
+  <button onclick="generateQRCode()">Generate QR Code</button>
+  <button onclick="downloadPDF()">Download as PDF</button>
+
+  <br><br>
+  <div id="qrcode"></div>
+
+  <script>
+    let qrCode;
+
+    function generateQRCode() {
+      const container = document.getElementById("qrcode");
+      container.innerHTML = "";  // Clear existing QR
+      const text = document.getElementById("qrText").value;
+
+      qrCode = new QRCode(container, {
+        text: text,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    async function downloadPDF() {
+      if (!qrCode) return alert("Please generate a QR code first!");
+
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) return alert("QR code rendering failed.");
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(14);
+      doc.text("Your QR Code", 20, 20);
+      doc.addImage(imgData, 'PNG', 20, 30, 100, 100);
+      doc.save("qr_code.pdf");
+    }
+
+    // Optionally auto-generate on load
+    generateQRCode();
+  </script>
+</body>
+</html>
